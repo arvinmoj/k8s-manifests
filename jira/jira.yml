@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jira
+  labels:
+    app: jira
+  namespace: jira
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: jira
+  template:
+    metadata:
+      labels:
+        app: jira
+    spec:
+      containers:
+        - name: jira
+          image: repo.payrad.org/atlassian/jira-software:9.12.2-devops
+          volumeMounts:
+            - name: jira-data-volume
+              mountPath: /var/atlassian/application-data/jira
+            - name: jira-logs-volume
+              mountPath: /var/atlassian/application-data/jira/log
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "250m"
+            limits:
+              memory: "4Gi"
+              cpu: "2"
+
+          env:
+          - name: ATL_DB_DRIVER
+            value: org.postgresql.Driver
+          - name: ATL_PROXY_PORT
+            value: '443'
+          - name: ATL_TOMCAT_SCHEME 
+            value: 'https'
+          - name: ATL_TOMCAT_SECURE
+            value: 'true'
+          - name: ATL_TOMCAT_PROTOCOL
+            value: 'org.apache.coyote.http11.Http11NioProtocol'
+          - name: ATL_PROXY_NAME
+            value: 'jira.org'
+          - name: TZ
+            value: 'Asia/Tehran'
+
+      initContainers:
+        - name: jira-permission-fix
+          image: repo.payrad.org/busybox
+          command:
+            [
+              "/bin/sh",
+              "-c",
+              "chown -R 2001:2001 /jira-data && chown -R 2001:2001 /jira-log",
+            ]
+          volumeMounts:
+            - name: jira-data-volume
+              mountPath: /jira-data
+            - name: jira-logs-volume
+              mountPath: /jira-log
+
+      volumes:
+        - name: jira-data-volume
+          persistentVolumeClaim:
+            claimName: jira-data-pv-claim
+        - name: jira-logs-volume
+          persistentVolumeClaim:
+            claimName: jira-logs-pv-claim
+
+      imagePullSecrets:
+        - name: payrad-repo

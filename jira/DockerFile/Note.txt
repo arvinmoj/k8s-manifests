@@ -1,0 +1,16 @@
+java -jar atlassian-agent.jar -p jira -m jira@test.com  -n jirad -o https://test.com  -s  BH2V-Z6MT-LQ1Q-ENAV
+
+URL:
+````
+https://jira.org
+````
+
+Crack Instructor:
+````
+For Crack Jira and Plugins 
+
+    ** exec to Jira Container
+    ** cd to /opt/atlassian/jira
+    then run
+    **    java -jar atlassian-agent.jar -d -m EMAIL -n BAT -p NAME_OF_PRODUCT -o ORGANIZATION_NAME -s SERVER_ID
+````

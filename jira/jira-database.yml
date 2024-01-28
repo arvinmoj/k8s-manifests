@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jira-postgres
+  namespace: jira
+spec:
+  strategy:
+    type: Recreate        
+  replicas: 1
+  selector:
+    matchLabels:
+      name: jira-postgres
+  template:
+    metadata:
+      name: jira-postgres
+      labels:
+        name: jira-postgres
+    spec:
+      imagePullSecrets:
+        - name: payrad-repo
+
+      volumes:
+        - name: jira-database-volume
+          persistentVolumeClaim:
+            claimName: jira-database-pvc
+        - name: jira-database-data-volume
+          persistentVolumeClaim:
+            claimName: jira-database-data-pvc
+        
+      containers:
+        - image: repo.payrad.org/postgres:15
+          name: jira-postgres
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-pwd
+                  key: postgresql-password
+            - name: POSTGRES_USER
+              value: jira
+            - name: POSTGRES_DB
+              value: jira
+          ports:
+            - containerPort: 5432
+              name: postgresport
+          volumeMounts:
+            # This name must match the volumes.name below.
+            - name: jira-database-volume
+              mountPath: /var/lib/postgresql
+              subPath: postgresql
+            - name: jira-database-data-volume
+              mountPath: /var/lib/postgresql/data
+              subPath: data

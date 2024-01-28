@@ -1,0 +1,32 @@
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jira-data-pv-claim
+  labels:
+    app: jira
+  namespace: jira
+spec:
+  
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: remote-disk
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jira-logs-pv-claim
+  labels:
+    app: jira
+  namespace: jira
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: remote-disk
