@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: test-psql
-  namespace: default
+  namespace: n8n
 spec:
   selector:
     app: test-postgres
@@ -16,7 +16,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: test-psql
-  namespace: default
+  namespace: n8n
   labels:
     app: test-postgres
 spec:
@@ -31,16 +31,16 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: postgres:13-alpine
+        image: repo.payrad.org/postgres:15
         env:
         - name: POSTGRES_PASSWORD
-          value: "testpassword"
+          value: "XC8buGC3NYjTgnMvMkRahQag2iHFSK7eW"
         - name: POSTGRES_USER
-          value: "testuser"
+          value: "n8n"
         - name: POSTGRES_DB
-          value: "testdb"
+          value: "n8n"
         - name: HOST
-          value: "0.0.0.0"
+          value: "172.21.86.223"
         ports:
         - containerPort: 5432
         resources:
